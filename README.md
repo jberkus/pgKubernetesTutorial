@@ -52,6 +52,25 @@ Server Version: version.Info{Major:"1", Minor:"10", GitVersion:"v1.10.0", GitCom
 [jberkus@ariolimax presos]$ minikube cache add registry.opensource.zalan.do/acid/spilo-9.6:1.2-p26
 ```
 
+Test that it's working:
+
+```
+14:10 $ kubectl get nodes
+NAME       STATUS    ROLES     AGE       VERSION
+minikube   Ready     master    2m        v1.10.0
+
+```
+
+### Cache Container Images
+
+In order to anticipate OSCON's bandwidth, we want to cache the main postgres container image:
+
+```
+minikube cache add registry.opensource.zalan.do/acid/spilo-cdp-10:1.4-p8
+```
+
+### Suspend minikube
+
 Once minikube is started up, it will have cached a lot of images.  So don't delete the VM.  Instead, halt it with:
 
 ```
@@ -59,6 +78,18 @@ minikube stop
 ```
 
 And you should be able to start things at the beginning of the workshop.
+
+### Clone this repository
+
+Switch to a good working directory for the exercises on your machine, and git clone the repository:
+
+```
+git clone https://github.com/jberkus/pgKubernetesTutorial.git
+```
+
+### Install PSQL
+
+Optionally, you may want to install PSQL on your platform in order to connect with the deployed cluster for testing.  This installation will depend heavily on your OS and version, so we won't cover it here.  Instead, see [the Postgres guide](http://postgresguide.com/setup/install.html).  Note that you only need the "client utilities", and not the database server.
 
 ### Problems With Preparation
 

@@ -1,0 +1,8 @@
+#!/bin/bash
+
+export HOST_PORT=$(minikube service acid-minimal-cluster --url | sed 's,.*/,,')
+export PGHOST=$(echo $HOST_PORT | cut -d: -f 1)
+export PGPORT=$(echo $HOST_PORT | cut -d: -f 2)
+export PGPASSWORD=$(kubectl --context minikube get secret postgres.acid-minimal-cluster.credentials -o 'jsonpath={.data.password}' | base64 -d)
+
+psql -U postgres

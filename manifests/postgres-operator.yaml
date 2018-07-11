@@ -1,0 +1,20 @@
+apiVersion: apps/v1beta1
+kind: Deployment
+metadata:
+  name: postgres-operator
+spec:
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        name: postgres-operator
+    spec:
+      serviceAccountName: zalando-postgres-operator
+      containers:
+      - name: postgres-operator
+        image: registry.opensource.zalan.do/acid/postgres-operator:1352c4a
+        imagePullPolicy: IfNotPresent
+        env:
+        # provided additional ENV vars can overwrite individual config map entries  
+        - name: CONFIG_MAP_NAME
+          value: "postgres-operator"
