@@ -572,12 +572,6 @@ Fully automated replication and failover
 
 ---
 
-## Now delete cluster
-
-`kubectl delete -f simple-patroni-cluster.yml`
-
----
-
 ![trimet bus operator](trimet_operator.jpg)
 
 ### Operators
@@ -701,13 +695,29 @@ Well, that's why we have ORMs
 
 ## Operator Configuration
 
-1. Create ConfigMap for cluster
+1. Create manifest for cluster
 2. Operator deploys async
 3. Configure other behavior
 
 ---
 
 ## Try Operator Config
+
+---
+
+## Now shut everything down
+
+* delete operator cluster
+* delete operator
+* delete patroni cluster
+* delete patroni configmaps
+* stop minishift
+
+---
+
+![garage sale](garagesale.gif)
+
+### More Stuff
 
 ---
 
@@ -758,7 +768,6 @@ postgres-slack.herokuapp.com<br />
 \#patroni
 
 slack.k8s.io  #sig-apps
-
 
 ---
 

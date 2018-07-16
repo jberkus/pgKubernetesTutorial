@@ -1,9 +1,9 @@
 apiVersion: "acid.zalan.do/v1"
 kind: postgresql
 metadata:
-  name: web-db5
+  name: spilo-s1
 spec:
-  teamId: "web"
+  teamId: "spilo"
   volume:
     size: 1Gi
   numberOfInstances: 3
@@ -15,9 +15,15 @@ spec:
 
     # role for application foo
     foo_user:
-  
+
+    # new role for application bar
+    bar_user:
+
   #databases: name->owner
   databases:
     foo: zalando
+    bar: zalando
   postgresql:
     version: "10"
+    parameters:
+      timezone: "America/Los_Angeles"

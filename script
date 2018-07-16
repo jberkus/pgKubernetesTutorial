@@ -1,0 +1,199 @@
+# Interactive command script for pgKubernetes Tutorial
+# Please use the following commands to copy-and-paste for
+# the exercises.
+
+# where you see $EDITOR, use the editor of your choice
+
+# start minikube, if you haven't already
+minikube start
+
+# download containers, if you haven't:
+minikube cache add jberkus/simple-patroni
+minikube cache add jberkus/spilo-demo
+
+## Manual Deployment ##
+
+# look at the definition file for a simple Patroni
+# cluster and get ready to deploy it
+$EDITOR patroni/patroni-k8s.yaml
+
+# deploy the cluster
+kubectl create -f patroni/patroni-k8s.yaml
+
+# look at the pods
+kubectl get pods -L role
+
+# watch the logs
+kubectl logs patronidemo-0
+# repeat above a few times
+
+# look at the pods again
+kubectl get pods -L role
+
+# look at a pod
+kubectl describe pod patronidemo-1
+
+# check out the services
+kubectl get services
+
+# check out the configmaps
+kubectl get configmaps
+kubectl describe configmap patronidemo-config
+kubectl describe configmap patronidemo-leader
+
+# check out secrets
+kubectl get secrets
+
+# trigger a failover
+kubectl delete pod patronidemo-0 --force
+
+# watch roles change
+kubectl get pods -L role
+# repeat above a few times
+
+# check out logs and leader config
+kubectl logs patronidemo-1
+kubectl describe configmap patronidemo-leader
+
+# feel free to repeat the above a few times
+
+## Postgres Operator ##
+
+# create the operator and its dependencies
+kubectl create -f operator/configmap.yaml  # configuration
+kubectl create -f operator/operator-service-account-rbac.yaml  # identity and permissions
+kubectl create -f operator/postgres-operator.yaml  # deployment
+# also look at the above files in your $EDITOR
+
+# poll the crds to see when the operator is created
+kubectl get crd
+kubectl get pods
+# repeat the above until it's done
+
+# look at the cluster definition
+$EDITOR operator/minimal-postgres-manifest.yaml
+
+# now deploy a cluster
+kubectl create -f operator/minimal-postgres-manifest.yaml
+
+# wait a minute for deployment, then
+kubectl get pods -L spilo-role
+# do the above a few times
+
+## Connecting ##
+
+# look at pg-shell container
+$EDITOR patroni/pg-shell.yaml
+
+# deploy it and log into a shell
+kubectl create -f patroni/pg-shell.yaml
+kubectl exec -it pg-shell -- bash
+
+# connect to the cluster master
+psql -h patronidemo
+select pg_is_in_recovery();
+create table test ( test text );
+\q
+
+# connect to the load-balancing RO connection
+psql -h patronidemo-ss
+select pg_is_in_recovery();
+# you may have to do the above a couple times to get a replica
+\d test
+\q
+
+# connect to a specific node
+exit
+kubectl get pods -L role
+kubectl exec -it pg-shell -- bash
+psql -h patronidemo-1.patronidemo-ss
+select pg_is_in_recovery();
+\q
+exit
+
+# look at patroni configuration
+kubectl exec -it patronidemo-0 -- bash
+more /home/postgres/patroni.yml
+
+## Patroni REST API ##
+
+# look at JSON output
+curl 127.0.0.1:8008/patroni
+
+# use patronictl
+patronictl list
+patronictl show-config
+
+# patronictl commands
+patronictl
+
+# switchover
+patronictl switchover
+# hit ENTER for the master, then choose a replica
+# then select "now" then select "y"
+patronictl list
+# do the above a few times until all nodes are running
+
+# failover
+patronictl failover
+# chose a replica, then select "y"
+patronictl list
+# do the above a few times until the cluster is restored
+exit
+
+## Operator Changes ##
+
+# connect to the operator cluster
+# this requires psql on your laptop command-line, sorry
+# some folks may skip this
+./operator/connect-min-cluster
+
+# look at timezone, time, and the list of
+# users and databases
+show timezone;
+select now();
+\du
+\l
+\q
+
+# now change the manifest
+$EDITOR operator/add-to-manifest.yaml
+# check out the additional user and the new timezone
+kubectl apply -f operator/add-to-manifest.yaml
+kubectl edit pg spilo-s1
+# exit your editor
+
+./operator/connect-min-cluster
+
+# look at timezone, time, and the list of
+# users and databases
+# these may take a minute or two to change
+show timezone;
+select now();
+\du
+\l
+\q
+
+## Delete Everything ##
+
+# delete operator cluster
+kubectl delete -f operator/minimal-postgres-manifest.yaml
+kubectl get pods -L spilo-role
+# do the above a few times until all nodes are gone
+
+# delete operator
+kubectl delete -f operator/configmap.yaml  # configuration
+kubectl delete -f operator/operator-service-account-rbac.yaml  # identity and permissions
+kubectl delete -f operator/postgres-operator.yaml  # deployment
+
+# delete manual patroni cluster and shell
+kubectl delete -f patroni/patroni_k8s.yaml
+kubectl delete -f patroni/pg-shell.yaml
+
+# now look at configmaps, and delete them.
+kubectl get configmaps
+kubectl delete configmap patronidemo-leader
+kubectl delete configmap patronidemo-config
+
+# and shut down
+minikube stop

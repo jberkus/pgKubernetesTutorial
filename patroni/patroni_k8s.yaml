@@ -1,3 +1,50 @@
+## optional, a load-balancing service
+## for read-only connections and direct
+## connections to a specific backend
+apiVersion: v1
+kind: Service
+metadata:
+  name: patronidemo-ss
+spec:
+  ports:
+  - port: 5432
+    name: psql
+  - port: 8008
+    name: patronictl
+  clusterIP: None
+  selector:
+    application: patroni
+    cluster-name: patronidemo
+
+---
+## endpoint, this is the master connection endpoint
+# also used as a lock for master election contests
+apiVersion: v1
+kind: Endpoints
+metadata:
+  name: &cluster_name patronidemo
+  labels:
+    application: patroni
+    cluster-name: *cluster_name
+subsets: []
+
+---
+## service for the master endpoint
+apiVersion: v1
+kind: Service
+metadata:
+  name: &cluster_name patronidemo
+  labels:
+    application: patroni
+    cluster-name: *cluster_name
+spec:
+  type: ClusterIP
+  ports:
+  - port: 5432
+    targetPort: 5432
+
+---
+## the statefulset, this is the actual database nodes
 apiVersion: apps/v1beta1
 kind: StatefulSet
 metadata:
@@ -7,7 +54,8 @@ metadata:
     cluster-name: *cluster_name
 spec:
   replicas: 3
-  serviceName: *cluster_name
+# change to *clustername if not using the load-balancing service
+  serviceName: patronidemo-ss
   template:
     metadata:
       labels:
@@ -80,30 +128,9 @@ spec:
          storage: 1Gi
 
 ---
-apiVersion: v1
-kind: Endpoints
-metadata:
-  name: &cluster_name patronidemo
-  labels:
-    application: patroni
-    cluster-name: *cluster_name
-subsets: []
-
----
-apiVersion: v1
-kind: Service
-metadata:
-  name: &cluster_name patronidemo
-  labels:
-    application: patroni
-    cluster-name: *cluster_name
-spec:
-  type: ClusterIP
-  ports:
-  - port: 5432
-    targetPort: 5432
-
----
+# passwords for the patroni database
+# if you had more users + passwords, you'd add them
+# here
 apiVersion: v1
 kind: Secret
 metadata:
@@ -117,6 +144,11 @@ data:
   replication-password: cmVwLXBhc3M=
 
 ---
+## the rest is a serviceaccount and RBAC
+# for permissions and access control for patroni
+# this is required for leader elections to work properly
+# and requires you to have admin rights on the
+# kubernetes cluster
 apiVersion: v1
 kind: ServiceAccount
 metadata:
@@ -148,6 +180,7 @@ rules:
   - patch
   - update
   # the following three privileges are necessary only when using endpoints
+  # and need to be removed for Openshift
   - create
   - list
   - watch

@@ -1,0 +1,18 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: pg-shell
+spec:
+  containers:
+  - name: pg-shell
+    image: jberkus/simple-patroni
+    command: ["/bin/bash", "-ec", "while :; do echo '.'; sleep 10 ; done"]
+    env:
+    - name: PGUSER
+      value: postgres
+    - name: PGPASSWORD
+      valueFrom:
+        secretKeyRef:
+          name: patronidemo
+          key: superuser-password
+  restartPolicy: Never

@@ -1,9 +1,9 @@
 apiVersion: "acid.zalan.do/v1"
 kind: postgresql
 metadata:
-  name: acid-minimal-cluster2
+  name: spilo-s1
 spec:
-  teamId: "ACID"
+  teamId: "spilo"
   volume:
     size: 1Gi
   numberOfInstances: 3
@@ -15,7 +15,7 @@ spec:
 
     # role for application foo
     foo_user:
-  
+
   #databases: name->owner
   databases:
     foo: zalando
