@@ -66,7 +66,8 @@ minikube   Ready     master    2m        v1.10.0
 In order to anticipate OSCON's bandwidth, we want to cache the main postgres container image:
 
 ```
-minikube cache add registry.opensource.zalan.do/acid/spilo-cdp-10:1.4-p8
+minikube cache add jberkus/simple-patroni
+minikube cache add jberkus/spilo-demo
 ```
 
 ### Suspend minikube

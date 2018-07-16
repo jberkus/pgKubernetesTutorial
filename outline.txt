@@ -1,0 +1,122 @@
+Introduction
+  - who this is for
+  - TOC
+  - preparing for hands-on exercises
+    - minikube
+    - download containers
+    - update repo
+
+A brief history of stateful applications on Kubernetes
+  - originally just storage
+  - replicaset limitations
+  - creation of statefulset/petset
+  - CRDs & Operators
+
+Trade-offs
+  - Management Tradeoffs
+    - Elephants vs. Mimmoths
+    - custom deployment vs. automated deployment
+    - shelling in vs. API
+    - shared large db vs. db-per-application
+    - dedicated server/VM vs. packing
+    - DBA team gating vs. self-service
+    - command-and-control vs. templating
+
+  - Peformance trade-offs
+    - network latency
+    - storage abstraction
+    - limits on large databases
+
+  - A comparison of high-availability frameworks
+    - Non-containerized
+      - regmgr, pgpoolII
+    - Paid cloud:
+      - RDS, Aurora
+    - Advantages of Containers/Kubernetes
+    - Containerized solutions:
+      - Patroni/Spilo
+      - Crunchy Postgres Operator
+      - Stolon
+
+  - Real-life use cases: Zalando, bugs.python.org
+    - zalando
+      - self-service for devs
+      - big infrastructure
+      - thousands of applications
+      - AWS-based cloud
+    - bugs.python.org
+      - Moved to openshift
+      - originally RDS
+      - wanted to "own it", save money
+      - moved to patroni-based storage
+
+Patroni
+  -  “The 80% solution”
+    - single-application DBs
+    - small database clusters
+    - fully automated HA
+    - Kubernetes services for LB
+    - not federated (but wait)
+    - AWS-friendly
+  - Patroni vs. Spilo
+  - How containerized HA works
+    - patroni diagram
+  - What’s inside the container
+    - interactive tour
+
+Deploying
+  - Operator versus manual
+    - What's an operator?
+    - Why you would use one
+      - templating
+      - scheduled tasks
+    - Manual deployment of Patroni Image
+      - interactive exercise
+    - Deployment of Operator Image
+      - interactive exercise
+    OpenShift versus Kubernetes deployments
+    - Advantages of Kubernetes
+    - Advantages of Openshift
+      - Locking limitation
+
+Management
+  - Testing HA and failover
+    - interactive exercise
+  - DevOps-ing database management
+    - using operators
+    - creating templates for your team
+    - workflow for DB deployment
+  - Managing database contents
+    - yes, use the ORM
+  - Administration API
+    - Port 8001
+    - PatroniCTL
+    - API commands
+      - Status
+      - Failover
+      - Scale
+      - pg_hba
+      - postgres settings (plus some cautions)
+  - Operator API
+    - Latency
+    - ConfigMap
+    - Changing things
+  - Disaster recovery
+    - Backups
+      - S3 option per Spilo
+      - Auto-restore
+      - Other options
+        - Building pgBackRest setup for bare metal
+
+Further work
+  - Production storage options
+    - Gluster
+    - Local Storage
+  - Public cloud considerations
+  - Customizing deployment
+  - Contributing to the project
+    - Patroni & spilo locations
+    - We need docs!
+    - Current work:
+      - Sync Rep
+      - Federation
