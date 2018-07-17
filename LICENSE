@@ -1,0 +1,9 @@
+# LICENSE
+
+## Slides, Script, and Other Contents
+
+The slides, outline, hands-on script, and collected contents as a whole are licensed [Creative Commons Share-Alike 4.0 License](https://creativecommons.org/licenses/by-sa/4.0/legalcode).  Permission is granted to share, copy, and fork this repo under the terms of that license, pending also obeying the restrictions of other licensed content (see below).
+
+## YAML Files
+
+The YAML files in the operator/ and patroni/ directories are licensed under the MIT license, a copy of which is found in those directories.  Terms of that license apply to the individual files in those directories, as well as the licensing of the repository as a whole.
