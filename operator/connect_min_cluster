@@ -3,6 +3,6 @@
 export HOST_PORT=$(minikube service spilo-s1 --url | sed 's,.*/,,')
 export PGHOST=$(echo $HOST_PORT | cut -d: -f 1)
 export PGPORT=$(echo $HOST_PORT | cut -d: -f 2)
-export PGPASSWORD=$(kubectl --context minikube get secret postgres.spilo-s1.credentials -o 'jsonpath={.data.password}' | base64 -d)
+export PGPASSWORD=$(kubectl --context minikube get secret postgres.spilo-s1.credentials -o 'jsonpath={.data.password}' | base64 --decode)
 
 psql -U postgres
