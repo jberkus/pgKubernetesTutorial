@@ -95,7 +95,7 @@ If you:
 1. Install minikube
 2. Install kubectl
 3. Download containers
-4. Sync the github repo
+4. Sync the github repo (or unzip it)
 
 github.com/jberkus/pgKubernetes
 
